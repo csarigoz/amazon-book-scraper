@@ -50,7 +50,7 @@ def fix_url(s):
 
 
 # product_data = []
-with open("urls.txt",'r') as urllist, open('output.jsonl','w') as outfile:
+with open("urls.txt",'r') as urllist, open('output.jsonl','a') as outfile:
     for url in urllist.read().splitlines():
         data = scrape(url) 
         if data:

@@ -2,7 +2,7 @@ name:
     css: '#productTitle'
     type: Text
 price:
-    css: '#price_inside_buybox'
+    css: '#price'
     type: Text
 short_description:
     css: 'div.a-expander-content.a-expander-partial-collapse-content > p:nth-child(1)'
