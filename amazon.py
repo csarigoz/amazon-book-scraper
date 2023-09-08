@@ -54,6 +54,7 @@ with open("urls.txt",'r') as urllist, open('output.jsonl','a') as outfile:
     for url in urllist.read().splitlines():
         data = scrape(url) 
         if data:
+            data["product_url"] = url
             if data["link_to_all_reviews"] is not None:
                 print(data["link_to_all_reviews"])
                 data["link_to_all_reviews"] = fix_url(data["link_to_all_reviews"])
