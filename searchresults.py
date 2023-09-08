@@ -2,6 +2,7 @@ from selectorlib import Extractor
 import requests 
 import json 
 from time import sleep
+import urllib.parse
 
 
 # Create an Extractor by reading from the YAML file
@@ -35,15 +36,31 @@ def scrape(url):
     # Pass the HTML of the page and create 
     return e.extract(r.text)
 
+def fix_url(s):
+    s = urllib.parse.unquote(s)
+    substring = "url="
+    if substring in s:
+        index = s.index(substring)
+        uri = s[index:]
+        s = uri.replace(substring, "https://www.amazon.com")   
+    else:
+        s = "https://www.amazon.com" + s
+    # Add your own affiliate tag here
+    url = s + "&tag=cagrisarigo03-20"
+    return url
+
 # product_data = []
-with open("search_results_urls.txt",'r') as urllist, open('search_results_output.jsonl','w') as outfile:
+with open("search_results_urls.txt",'r') as urllist, open('search_results_output.jsonl','a') as outfile, open('search_results_output.txt','a') as outlistfile:
     for url in urllist.read().splitlines():
         data = scrape(url) 
         if data:
             for product in data['products']:
+                product["url"] = fix_url(product["url"])
+                product_url = product["url"]
                 product['search_url'] = url
-                print("Saving Product: %s"%product['title'])
+                print("Saving Product: %s"%product_url)
                 json.dump(product,outfile)
                 outfile.write("\n")
-                # sleep(5)
+                outlistfile.write(product_url+"\n")
+        sleep(5)
     

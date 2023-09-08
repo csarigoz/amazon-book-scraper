@@ -2,7 +2,7 @@ from selectorlib import Extractor
 import requests 
 import json 
 from time import sleep
-
+import urllib.parse
 
 # Create an Extractor by reading from the YAML file
 e = Extractor.from_yaml_file('selectors.yml')
@@ -35,12 +35,31 @@ def scrape(url):
     # Pass the HTML of the page and create 
     return e.extract(r.text)
 
+def fix_url(s):
+    s = urllib.parse.unquote(s)
+    substring = "url="
+    if substring in s:
+        index = s.index(substring)
+        uri = s[index:]
+        s = uri.replace(substring, "https://www.amazon.com")   
+    else:
+        s = "https://www.amazon.com" + s
+    # Add your own affiliate tag here
+    url = s + "&tag=cagrisarigo03-20"
+    return url
+
+
 # product_data = []
-with open("urls.txt",'r') as urllist, open('output.jsonl','w') as outfile:
+with open("urls.txt",'r') as urllist, open('output.jsonl','a') as outfile:
     for url in urllist.read().splitlines():
         data = scrape(url) 
         if data:
+            data["product_url"] = url
+            if data["link_to_all_reviews"] is not None:
+                print(data["link_to_all_reviews"])
+                data["link_to_all_reviews"] = fix_url(data["link_to_all_reviews"])
+            if data["number_of_reviews"] is not None:
+                data["number_of_reviews"] = data["number_of_reviews"].replace(" ratings", "")
             json.dump(data,outfile)
             outfile.write("\n")
             # sleep(5)
-    
